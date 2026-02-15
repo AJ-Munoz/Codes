@@ -52,3 +52,17 @@ plt.show()
 # 8) Evaluate on test set
 test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=0)
 print(f'\nTest accuracy: {test_acc:.4f}')
+
+# 9) Load and preprocess a custom image
+from PIL import Image
+path = "my_digit.png"            
+img = Image.open(path).convert('L')           # grayscale
+img_28 = img.resize((28, 28), Image.LANCZOS)
+x = np.array(img_28).astype('float32') / 255.0      # shape: (28, 28)
+x = np.expand_dims(x, axis=0)                       # shape: (1, 28, 28)
+
+# 10) Predict
+prediction = model.predict(x, verbose=0)
+pred_class = int(np.argmax(prediction))
+print("Predicted digit:", pred_class)
+print("Probabilities:", np.round(prediction[0], 3))
