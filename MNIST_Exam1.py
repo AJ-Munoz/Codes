@@ -15,8 +15,8 @@ test_images  = test_images.astype('float32') / 255.0
 #    NOTE: input_shape is (28, 28) because images are 2D without an explicit channel dim.
 model = models.Sequential([
     layers.Flatten(input_shape=(28, 28)),
+    layers.Dense(256, activation='relu'),
     layers.Dense(128, activation='relu'),
-    #layers.Dense(64, activation='relu'),
     layers.Dense(10, activation='softmax')
 ])
 
@@ -31,8 +31,8 @@ model.compile(
 model.fit(
     train_images,
     train_labels,
-    epochs=5,
-    verbose=1
+    epochs=20,
+    verbose=0
 )
 
 # 6) Quick dataset info
@@ -52,4 +52,6 @@ plt.show()
 # 8) Evaluate on test set
 test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=0)
 print(f'\nTest accuracy: {test_acc:.4f}')
+
+
 

@@ -7,6 +7,13 @@ class Perceptron:
         self.weights = None
         self.bias = None
 
+    def predict(self, X):
+            # Calculate the weighted sum
+            linear_output = np.dot(X, self.weights) + self.bias
+            # Apply step function (binary classification)
+            # Returns 1 if linear_output >= 0, otherwise -1
+            return np.where(linear_output >= 0.0, 1, 0)
+            
     def fit(self, X, y):
         # Initialize weights and bias
         n_samples, n_features = X.shape
@@ -25,18 +32,13 @@ class Perceptron:
                     self.weights += update * x_i
                     self.bias += update
 
-    def predict(self, X):
-        # Calculate the weighted sum
-        linear_output = np.dot(X, self.weights) + self.bias
-        # Apply step function (binary classification)
-        # Returns 1 if linear_output >= 0, otherwise -1
-        return np.where(linear_output >= 0.0, 1, 0)
+    
 
 # --- Example Usage (AND gate logic) ---
 # Inputs
 X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
 # Labels (for AND: [0, 0, 0, 1]. Map 0 to -1 for this implementation)
-y = np.array([-1, -1, -1, 1])
+y = np.array([0, 0, 0, 1])
 
 # Create and train the perceptron
 perceptron = Perceptron(learning_rate=0.1, n_iterations=10)

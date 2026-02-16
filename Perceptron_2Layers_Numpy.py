@@ -1,50 +1,79 @@
 import numpy as np
 
-# Sigmoid and its derivative
-def sigmoid(x): return 1 / (1 + np.exp(-x))
-def sigmoid_derivative(x): s = sigmoid(x); return s * (1 - s)
+# ---------------------------
+# Utilities
+# ---------------------------
+def sigmoid(x):
+    # Numerically safer sigmoid via clipping to avoid overflow in exp
+    x = np.clip(x, -40, 40)
+    return 1.0 / (1.0 + np.exp(-x))
 
-# 1. Setup Data (XOR)
-X = np.array([[0,0], [0,1], [1,0], [1,1]])
-y = np.array([[0], [1], [1], [0]])
+def sigmoid_derivative(x):
+    # Derivative with respect to pre-activation input x
+    s = sigmoid(x)
+    return s * (1.0 - s)
 
-# 2. Initialize Weights & Biases
+# ---------------------------
+# 1) Data: XOR
+# ---------------------------
+X = np.array([[0, 0],
+              [0, 1],
+              [1, 0],
+              [1, 1]], dtype=float)
+
+y = np.array([[0],
+              [1],
+              [1],
+              [0]], dtype=float)
+
+# ---------------------------
+# 2) Parameters: weights & biases
+# Architecture: 2 -> 2 -> 1, sigmoid activations
+# ---------------------------
 np.random.seed(42)
-w_hidden = np.random.uniform(size=(2, 2))
-b_hidden = np.random.uniform(size=(1, 2))
-w_output = np.random.uniform(size=(2, 1))
-b_output = np.random.uniform(size=(1, 1))
+w_hidden = np.random.uniform(low=-1.0, high=1.0, size=(2, 2))  # (in=2, hidden=2)
+b_hidden = np.random.uniform(low=-1.0, high=1.0, size=(1, 2))  # (2, hidden)
+w_output = np.random.uniform(low=-1.0, high=1.0, size=(2, 1))  # (hidden=2, out=1)
+b_output = np.random.uniform(low=-1.0, high=1.0, size=(1, 1))  # (1, out)
 
 lr = 0.5
+epochs = 1000
 
-# 3. Training Loop
-for epoch in range(1000): # Increased epochs for better convergence
-    # --- Forward Pass ---
-    z_hidden = np.dot(X, w_hidden) + b_hidden
-    v_hidden = sigmoid(z_hidden)
-    
-    z_output = np.dot(v_hidden, w_output) + b_output
-    y_hat = sigmoid(z_output)
+# ---------------------------
+# 3) Training Loop (batch size = 4 samples)
+# ---------------------------
+for epoch in range(epochs):
+    # --- Forward ---
+    z_hidden = X @ w_hidden + b_hidden       # (4,2)
+    v_hidden = sigmoid(z_hidden)             # (4,2)
 
-    # --- Backward Pass ---
-    # Error at output (Target - Predicted)
-    error = y - y_hat
-    d_output = error * sigmoid_derivative(z_output)
+    z_output = v_hidden @ w_output + b_output  # (4,1)
+    y_hat = sigmoid(z_output)                  # (4,1)
 
-    # Error at hidden layer
-    error_hidden = d_output.dot(w_output.T)
-    d_hidden = error_hidden * sigmoid_derivative(z_hidden)
+    # --- Backward ---
+    # Using error = (target - prediction) so that adding the update moves along -grad
+    error = y - y_hat                                    # (4,1)
+    d_output = error * sigmoid_derivative(z_output)      # (4,1)
 
-    # --- Update Weights & Biases ---
-    w_output += v_hidden.T.dot(d_output) * lr
-    # Summing across axis 0 ensures we get one bias update per neuron
-    b_output += np.sum(d_output, axis=0, keepdims=True) * lr
-    
-    w_hidden += X.T.dot(d_hidden) * lr
-    b_hidden += np.sum(d_hidden, axis=0, keepdims=True) * lr
+    error_hidden = d_output @ w_output.T                    # (4,2)
+    d_hidden = error_hidden * sigmoid_derivative(z_hidden)  # (4,2)
 
-# 4. Results
-print("Final Predictions (Raw):")
-print(y_hat)
+    # --- Update ---
+    w_output += (v_hidden.T @ d_output) * lr                  # (2,1)
+    b_output += np.sum(d_output, axis=0, keepdims=True) * lr  # (1,1)
+
+    w_hidden += (X.T @ d_hidden) * lr                         # (2,2)
+    b_hidden += np.sum(d_hidden, axis=0, keepdims=True) * lr  # (1,2)
+
+    # Optional: print progress occasionally
+    # if (epoch + 1) % 200 == 0:
+    #     mse = np.mean((y - y_hat) ** 2)
+    #     print(f"Epoch {epoch+1:4d} | MSE: {mse:.6f}")
+
+# ---------------------------
+# 4) Results
+# ---------------------------
+print("Final Predictions (raw probabilities):")
+print(np.round(y_hat, 6))
 print("\nRounded Predictions:")
 print(np.round(y_hat))
