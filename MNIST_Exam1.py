@@ -1,4 +1,3 @@
-
 import tensorflow as tf
 from tensorflow.keras import layers, models
 import matplotlib.pyplot as plt
@@ -53,5 +52,4 @@ plt.show()
 test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=0)
 print(f'\nTest accuracy: {test_acc:.4f}')
 
-
-
+model.save("my_model.h5")

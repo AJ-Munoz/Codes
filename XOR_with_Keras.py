@@ -1,3 +1,7 @@
+import os
+# Hides INFO and WARNING logs
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
 import tensorflow as tf
 import numpy as np
 
@@ -13,12 +17,17 @@ y = np.array([[0],[1],[1],[0]], dtype=np.float32)
 uinit = tf.keras.initializers.RandomUniform(minval=-1.0, maxval=1.0, seed=42)
 
 # Build model: 2 -> 2 -> 1, sigmoid activations, same init for kernels & biases
+import tensorflow as tf
+
 model = tf.keras.Sequential([
-    tf.keras.layers.Dense(2, activation='sigmoid', input_shape=(2,),
+    tf.keras.layers.Input(shape=(2,)), 
+    tf.keras.layers.Dense(2, activation='sigmoid',
                           kernel_initializer=uinit, bias_initializer=uinit),
+    
     tf.keras.layers.Dense(1, activation='sigmoid',
                           kernel_initializer=uinit, bias_initializer=uinit)
 ])
+
 
 # Loss with SUM reduction to match numpy's batch-sum gradient scaling
 loss_sum_mse = tf.keras.losses.MeanSquaredError(

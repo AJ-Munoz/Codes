@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw
 import matplotlib.pyplot as plt
 
 SIZE = 280   # Large canvas for smooth drawing5
-BRUSH = 10   # Brush diameter (pixels)
+BRUSH = 20   # Brush diameter (pixels)
 
 # Backing image we will convert to 28x28
 img = Image.new('L', (SIZE, SIZE), 0)      # black background
