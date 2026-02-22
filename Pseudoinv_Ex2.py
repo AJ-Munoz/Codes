@@ -2,36 +2,37 @@ import numpy as np
 from scipy.linalg import pinv
 import matplotlib.pyplot as plt
 
-np.random.seed(1)
 
-# Modal shape: e.g., dominant bending mode
-n = 200
-x = np.linspace(0, 1, n)
-mode_shape = np.sin(3 * np.pi * x)  # known aerodynamic mode
+np.random.seed(7)
 
-# True modal amplitude
-A_true = 2.5
+# Coordinate and true weights
+n = 200; x = np.linspace(0, 1, 200)
+w_true = np.array([1.5, -1.5, 0.5])  # True weights
 
-# Clean signal
-clean = A_true * mode_shape
+# Nonlinear features f_i(x)
+f1 = np.sin(np.pi * x)
+f2 = np.sin(2 * np.pi * x)
+f3 = np.cos(8 * np.pi * x)
 
-# Add aerodynamic turbulence noise
-noise = 0.6 * np.random.randn(n)
-y = clean + noise
+# Design matrix F with columns f1, f2, f3
+F = np.column_stack([f1, f2, f3])
 
-# Design matrix: one basis vector (the mode shape)
-F = mode_shape[:, None]
+# Clean signal and noisy measurement
+y_clean = F @ w_true
+noise = 0.5 * np.random.randn(n)
+y = y_clean + noise
 
-# Pseudoinverse estimate of modal amplitude
-A_hat = float(pinv(F) @ y)
+# Pseudoinverse solution w
+w_hat = pinv(F) @ y      # shape (3,)
+y_hat = F @ w_hat        # denoised projection onto span{f1,f2,f3}
 
-denoised = A_hat * mode_shape
+print("Estimated weights:", w_hat)
 
-print("True amplitude:", A_true)
-print("Estimated amplitude:", A_hat)
+# Visualize the results
+plt.figure(figsize=(10, 6))
+plt.plot(x, y,        alpha=0.5, lw=2.0, label="noisy")
+plt.plot(x, y_clean,  alpha=0.9, lw=2.0, label="clean (true)")
+plt.plot(x, y_hat,    alpha=0.9, lw=2.0, label="denoised (projection)")
 
-# (Optional plotting)
-plt.plot(x, y, label="noisy")
-plt.plot(x, denoised, label="denoised")
-plt.legend()
-plt.show()
+plt.xlabel("span x"); plt.ylabel("response")
+plt.legend(); plt.tight_layout(); plt.show()
