@@ -30,9 +30,14 @@ print("Estimated weights:", w_hat)
 
 # Visualize the results
 plt.figure(figsize=(10, 6))
+plt.title("Pseudoinverse-based Denoising", fontsize=16)
 plt.plot(x, y,        alpha=0.5, lw=2.0, label="noisy")
-plt.plot(x, y_clean,  alpha=0.9, lw=2.0, label="clean (true)")
-plt.plot(x, y_hat,    alpha=0.9, lw=2.0, label="denoised (projection)")
+plt.plot(x, y_clean,  alpha=0.9, lw=2.0, label="clean")
+plt.plot(x, y_hat,    alpha=0.9, lw=2.0, label="denoised")
 
-plt.xlabel("span x"); plt.ylabel("response")
-plt.legend(); plt.tight_layout(); plt.show()
+plt.xlabel("span x", fontsize=16); 
+plt.ylabel("response", fontsize=16)
+plt.legend(); 
+plt.tight_layout(); 
+plt.grid();
+plt.show()

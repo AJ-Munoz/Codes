@@ -41,9 +41,9 @@ time = [0]
 
 for i in range(steps):
     W_inv = damped_inverse(get_W(eta[0], eta[1]), 0.1)
-    #eta_ref = np.array([np.pi/3, np.pi, -np.pi/6])  # Desired orientation (roll, pitch, yaw)
-    #omega_cmd = - 1.0 * get_W(eta[0], eta[1]) @ (eta - eta_ref)  # Proportional control to track reference
-    omega_cmd += 0.001 * (np.random.rand(3) - 0.5)  # Add small random noise to the command
+    eta_ref = np.array([np.pi/3, np.pi, -np.pi/6])  # Desired orientation (roll, pitch, yaw)
+    omega_cmd = - 1.0 * get_W(eta[0], eta[1]) @ (eta - eta_ref)  # Proportional control to track reference
+    # omega_cmd += 0.001 * (np.random.rand(3) - 0.5)  # Add small random noise to the command
     eta += (W_inv @ omega_cmd) * dt
     history.append(eta.copy())
     time.append(time[-1] + dt)

@@ -1,0 +1,37 @@
+import numpy as np
+from scipy.linalg import pinv
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+# Synthetic wind-tunnel data
+N = 250
+angle = np.linspace(-15, 25, N) * np.pi/180.0       # radians
+q = 0.2 + 0.05*np.sin(4*np.pi*np.linspace(0,1,N))   # dynamic pressure
+
+# True parameters (unknown in practice)
+w_true = np.array([0.1, 6.2,  -35.47, 0.023])  # [1, angle, angle^3, q]
+
+# Design matrix: [angle, angle^3, q, 1]
+F = np.column_stack([np.ones_like(angle), angle, angle**3, q])
+
+# Generate C_L with noise
+CL_clean = F @ w_true
+CL = CL_clean + 0.05*np.random.randn(N)
+
+# Pseudoinverse estimate
+w_hat = pinv(F) @ CL
+CL_hat = F @ w_hat
+
+# Visualization
+plt.figure(figsize=(10, 6))
+plt.title("Pseudoinverse-based Denoising of C_L", fontsize=16)
+plt.plot(angle*180/np.pi, CL,        alpha=0.5, lw=2.0, label="noisy C_L")
+plt.plot(angle*180/np.pi, CL_clean,  alpha=0.9, lw=2.0, label="clean C_L")
+plt.plot(angle*180/np.pi, CL_hat,    alpha=0.9, lw=2.0, label="denoised C_L")
+plt.xlabel("angle of attack (degrees)", fontsize=16)
+plt.ylabel("lift coefficient C_L", fontsize=16)
+plt.legend()
+plt.tight_layout()
+plt.grid()
+plt.show()
