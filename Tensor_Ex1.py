@@ -38,7 +38,7 @@ model.compile(
 )
 
 # Train the Model
-model.fit(X, y, epochs=1000, batch_size=1, verbose=0)
+model.fit(X, y, epochs=100, batch_size=1, verbose=0)
 
 # Make Predictions
 test_data = np.array([[0.2, 0.5]])
