@@ -11,24 +11,42 @@ data = {
     'label':    [0,   0,   1,   1,   1  ]
 }
 
+# New Dataset
+"""
+data = {
+    'feature1': [
+        0.2, 0.25, 0.3, 0.35,    # inner points (label 0)
+        0.0, 0.6, 0.6, 0.0       # outer points (label 1)
+    ],
+    'feature2': [
+        0.2, 0.35, 0.2, 0.35,    # inner points (label 0)
+        0.0, 0.0, 0.6, 0.6       # outer points (label 1)
+    ],
+    'label': [
+        0, 0, 0, 0,              # inner points
+        1, 1, 1, 1               # outer points
+    ]
+}
+"""
+
 df = pd.DataFrame(data)
 X = df[['feature1', 'feature2']].values
 y = df['label'].values
 
-# Create a Neural Network
-"""
+# Create Neural Network
 model = Sequential()
 model.add(Dense(8, input_dim=2, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
-"""
+
 #Other way to create it
+"""
 model = Sequential([
     Dense(20, input_dim=2, activation='relu'),
     Dense(15, activation='relu'),
     Dense(15, activation='relu'),
     Dense(1, activation='sigmoid')
 ])
-
+"""
 
 # Compile the Model
 model.compile(
