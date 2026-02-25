@@ -1,7 +1,7 @@
 import numpy as np
 
 class Perceptron:
-    def __init__(self, learning_rate=0.01, n_iterations=100):
+    def __init__(self, learning_rate=0.01, n_iterations=10):
         self.learning_rate = learning_rate
         self.n_iterations = n_iterations
         self.weights = None
@@ -11,7 +11,7 @@ class Perceptron:
             # Calculate the weighted sum
             linear_output = np.dot(X, self.weights) + self.bias
             # Apply step function (binary classification)
-            # Returns 1 if linear_output >= 0, otherwise -1
+            # Returns 1 if linear_output >= 0, otherwise 0
             return np.where(linear_output >= 0.0, 1, 0)
             
     def fit(self, X, y):

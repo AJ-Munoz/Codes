@@ -1,3 +1,7 @@
+import os
+# Hides INFO and WARNING logs
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
 import tensorflow as tf
 from tensorflow.keras import layers, models
 import matplotlib.pyplot as plt
@@ -14,10 +18,11 @@ test_images  = test_images.astype('float32') / 255.0
 #    NOTE: input_shape is (28, 28) because images are 2D without an explicit channel dim.
 model = models.Sequential([
     layers.Flatten(input_shape=(28, 28)),
-    layers.Dense(256, activation='relu'),
     layers.Dense(128, activation='relu'),
     layers.Dense(10, activation='softmax')
 ])
+
+model.summary()
 
 # 4) Compile with sparse labels (integers 0..9)
 model.compile(
@@ -30,8 +35,8 @@ model.compile(
 model.fit(
     train_images,
     train_labels,
-    epochs=20,
-    verbose=0
+    epochs=5,
+    verbose=1
 )
 
 # 6) Quick dataset info
@@ -50,6 +55,7 @@ plt.show()
 
 # 8) Evaluate on test set
 test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=0)
+print(f'\nTest test loss: {test_loss:.4f}')
 print(f'\nTest accuracy: {test_acc:.4f}')
 
-model.save("my_model.h5")
+#model.save("my_model.h5")
