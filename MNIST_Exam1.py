@@ -1,7 +1,3 @@
-import os
-# Hides INFO and WARNING logs
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
 import tensorflow as tf
 from tensorflow.keras import layers, models
 import matplotlib.pyplot as plt

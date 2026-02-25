@@ -32,8 +32,6 @@ class Perceptron:
                     self.weights += update * x_i
                     self.bias += update
 
-    
-
 # --- Example Usage (AND gate logic) ---
 # Inputs
 X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
