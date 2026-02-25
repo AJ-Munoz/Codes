@@ -33,7 +33,7 @@ def get_cube_faces(center, size):
     ]
 
 # Setup simulation
-dt, steps = 0.001, 10000
+dt, steps = 0.001, 10000 # 10 seconds at 1ms steps
 eta = np.array([0.0, 0.0, 0.0])  # Initial orientation (roll, pitch, yaw)
 omega_cmd = np.array([0.2, 0.1, 0.3])
 history = []
