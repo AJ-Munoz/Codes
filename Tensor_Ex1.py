@@ -5,14 +5,15 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
 # Create and Load Dataset
+"""
 data = {
     'feature1': [0.1, 0.2, 0.3, 0.4, 0.5],
     'feature2': [0.5, 0.4, 0.3, 0.2, 0.1],
     'label':    [0,   0,   1,   1,   1  ]
 }
+"""
 
 # New Dataset
-"""
 data = {
     'feature1': [
         0.2, 0.25, 0.3, 0.35,    # inner points (label 0)
@@ -27,7 +28,6 @@ data = {
         1, 1, 1, 1               # outer points
     ]
 }
-"""
 
 df = pd.DataFrame(data)
 X = df[['feature1', 'feature2']].values

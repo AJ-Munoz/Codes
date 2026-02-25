@@ -4,7 +4,7 @@ import time
 import numpy as np
 
 # --- Configuration ---
-PORT = 'COM16'  
+PORT = 'COM20'  
 BAUD = 115200
 TICKS = 4128  # Counter Ticks per Half Revolution (172*24)
 Ts = 0.003  # Target Sampling Times

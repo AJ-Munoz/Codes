@@ -15,6 +15,7 @@ test_images  = test_images.astype('float32') / 255.0
 model = models.Sequential([
     layers.Flatten(input_shape=(28, 28)),
     layers.Dense(128, activation='relu'),
+    layers.Dense(64, activation='relu'),
     layers.Dense(10, activation='softmax')
 ])
 

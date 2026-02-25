@@ -35,9 +35,9 @@ plt.plot(x, y,        alpha=0.5, lw=2.0, label="noisy")
 plt.plot(x, y_clean,  alpha=0.9, lw=2.0, label="clean")
 plt.plot(x, y_hat,    alpha=0.9, lw=2.0, label="denoised")
 
-plt.xlabel("span x", fontsize=16); 
+plt.xlabel("span x", fontsize=16) 
 plt.ylabel("response", fontsize=16)
-plt.legend(); 
-plt.tight_layout(); 
-plt.grid();
+plt.legend()
+plt.tight_layout()
+plt.grid()
 plt.show()
