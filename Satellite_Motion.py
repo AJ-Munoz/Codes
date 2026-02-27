@@ -19,6 +19,25 @@ def get_R(phi, theta, psi):
     Rz = np.array([[np.cos(psi), -np.sin(psi), 0], [np.sin(psi), np.cos(psi), 0], [0, 0, 1]])
     return Rz @ Ry @ Rx
 
+# Setup simulation
+dt, steps = 0.001, 10000
+eta = np.array([0.0, 1.5708, 0.0])  # Initial orientation (roll, pitch, yaw)
+omega_cmd = np.array([0.05, -0.02, 0.1])
+history = []
+time = [0]
+
+for i in range(steps):
+    W_inv = damped_inverse(get_W(eta[0], eta[1]), 0.1)
+    omega_cmd += 0.01 * (np.random.rand(3) - 0.5)  # Add small random noise to the command
+    eta += (W_inv @ omega_cmd) * dt
+    history.append(eta.copy())
+    time.append(time[-1] + dt)
+
+# --- Pre-generate Stars ---
+num_stars = 500
+star_coords = (np.random.rand(num_stars, 3) - 0.5) * 8 
+star_sizes = np.random.rand(num_stars) * 7           
+
 # --- Satellite Geometry ---
 def get_cube_faces(center, size):
     s = size / 2
@@ -31,25 +50,6 @@ def get_cube_faces(center, size):
         [[x-s,y-s,z-s], [x-s,y+s,z-s], [x-s,y+s,z+s], [x-s,y-s,z+s]], # Left
         [[x+s,y-s,z-s], [x+s,y+s,z-s], [x+s,y+s,z+s], [x+s,y-s,z+s]]  # Right
     ]
-
-# Setup simulation
-dt, steps = 0.001, 10000
-eta = np.array([0.0, 1.5708, 0.0])  # Initial orientation (roll, pitch, yaw)
-omega_cmd = np.array([0.2, 0.1, 0.3])
-history = []
-time = [0]
-
-for i in range(steps):
-    W_inv = damped_inverse(get_W(eta[0], eta[1]), 0.0)
-    omega_cmd += 0.001 * (np.random.rand(3) - 0.5)  # Add small random noise to the command
-    eta += (W_inv @ omega_cmd) * dt
-    history.append(eta.copy())
-    time.append(time[-1] + dt)
-
-# --- Pre-generate Stars ---
-num_stars = 500
-star_coords = (np.random.rand(num_stars, 3) - 0.5) * 8 
-star_sizes = np.random.rand(num_stars) * 7            
 
 fig = plt.figure(figsize=(10, 8), facecolor='#050505')
 ax = fig.add_subplot(111, projection='3d', facecolor='#050505')
@@ -84,7 +84,7 @@ def update(i):
                                              edgecolors='silver', alpha=1.0))
 
     title_text = (
-        f"Orbital Tracking\n"
+        f"Orbital Tracking (Gemini Generated)\n"
         f"time: {time[i]:.2f}s | "
         f"Roll: {np.degrees(history[i][0]):.2f}° | "
         f"Pitch: {np.degrees(history[i][1]):.2f}° | "

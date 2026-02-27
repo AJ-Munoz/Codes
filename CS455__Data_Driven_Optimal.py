@@ -4,10 +4,10 @@ import time
 import numpy as np
 
 # --- Configuration ---
-PORT = 'COM20'  
-BAUD = 115200
-TICKS = 4128  # Counter Ticks per Half Revolution (172*24)
-Ts = 0.003  # Target Sampling Times
+PORT = 'COM20'  # Check your port in Device Manager (Windows) or /dev/tty* (Linux/Mac)
+BAUD = 115200   # Change this in Device Manager if needed
+TICKS = 4128    # Counter Ticks per Half Revolution (172*24)
+Ts = 0.003      # Target Sampling Times
 TIMEOUT = 0.1
 
 # --- Initialize Serial ---
@@ -22,7 +22,7 @@ except Exception as error:
 print("\n--- DC Motor Control ---")
 
 # --- System Variables ---
-t, theta, e, e_prev = 0.0, 0.0, 0.0, 0.0
+t, theta, error, error_prev = 0.0, 0.0, 0.0, 0.0
 theta0 = None
 u, u0 = 0.0, 0.0
 dt = 0.0 # dt is calculated in the loop
@@ -71,11 +71,11 @@ try:
         
         # 7. Tracking Control
         ref = 0.5*np.pi * np.sin(t) + 0.5*np.pi * np.sin(t/2)
-        e_prev = e
-        e = theta - ref
+        error_prev = error
+        error = theta - ref
 
         # Projected Gauss-Seidel for |u| <= uM
-        u0 = - 20.0*e
+        u0 = - 20.0*error
         uM = 1.0
         l1, l2 = 0.0, 0.0
         for i in range(10):
@@ -92,10 +92,10 @@ try:
         ser.write(bytes([target_sel, pwm]))
 
         # 9. Metrics & Logging
-        ISE += dt * e**2
+        ISE += dt * error**2
         ISC += dt * u**2
-        f.write(f"{t:.4f}\t{e:.4f}\t{theta:.4f}\t{ref:.4f}\t{u:.4f}\t{dt:.4f}\n")
-    
+        f.write(f"{t:.4f}\t{error:.4f}\t{theta:.4f}\t{ref:.4f}\t{u:.4f}\t{dt:.4f}\n")
+
 except KeyboardInterrupt:
     print("\nInterrupted by user.")
 finally:

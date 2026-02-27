@@ -48,6 +48,8 @@ for i in range(steps):
     history.append(eta.copy())
     time.append(time[-1] + dt)
 
+# USE THIS FOR ANIMATION (GEMINI-GENERATED) INSTEAD OF STATIC PLOTS
+"""
 # --- Pre-generate Stars ---
 num_stars = 500
 star_coords = (np.random.rand(num_stars, 3) - 0.5) * 8 
@@ -105,3 +107,21 @@ ani = FuncAnimation(
 )
 
 plt.show()
+"""
+
+# USE THIS FOR STATIC PLOTS INSTEAD OF ANIMATION
+"""
+history_np = np.array(history)
+plt.figure(figsize=(10, 6))
+plt.title("Pseudoinverse-based Control Tracking", fontsize=16)
+plt.plot(time[:-1], np.degrees(history_np[:, 0]), alpha=0.8, lw=2.0, label="roll")
+plt.plot(time[:-1], np.degrees(history_np[:, 1]), alpha=0.8, lw=2.0, label="pitch")
+plt.plot(time[:-1], np.degrees(history_np[:, 2]), alpha=0.8, lw=2.0, label="yaw")
+
+plt.xlabel("Time [s]", fontsize=14)
+plt.ylabel("Angle [deg]", fontsize=14)
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.show()
+"""
