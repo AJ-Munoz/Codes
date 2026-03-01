@@ -16,6 +16,7 @@ model = models.Sequential([
     layers.Flatten(input_shape=(28, 28)),
     layers.Dense(128, activation='relu'),
     layers.Dense(64, activation='relu'),
+    layers.Dense(32, activation='relu'),
     layers.Dense(10, activation='softmax')
 ])
 
@@ -32,7 +33,7 @@ model.compile(
 model.fit(
     train_images,
     train_labels,
-    epochs=5,
+    epochs=100,
     verbose=1
 )
 
@@ -55,4 +56,4 @@ test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=0)
 print(f'\nTest test loss: {test_loss:.4f}')
 print(f'\nTest accuracy: {test_acc:.4f}')
 
-#model.save("my_model.h5")
+model.save("my_model.keras")  # Save the entire model for later use

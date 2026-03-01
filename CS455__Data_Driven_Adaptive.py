@@ -24,7 +24,8 @@ print("\n--- DC Motor Control ---")
 # --- System Variables ---
 t, theta, error, error_prev = 0.0, 0.0, 0.0, 0.0
 theta0 = None
-u, u0 = 0.0, 0.0
+u, v, = 0.0, 0.0
+gamma = None
 dt = 0.0 # dt is calculated in the loop
 ISE, ISC = 0.0, 0.0
 
@@ -75,15 +76,8 @@ try:
         error = theta - ref
 
         # Projected Gauss-Seidel for |u| <= uM
-        u0 = - 20.0*error
-        uM = 1.0
-        l1, l2 = 0.0, 0.0
-        for i in range(10):
-            # l1 handles u <= uM -> (u0 - l1 + l2) <= uM
-            l1 = max(0,  u0 - uM + l2 ) 
-            # l2 handles u >= -uM -> (u0 - l1 + l2) >= -uM
-            l2 = max(0, - u0 - uM + l1 )
-        u = u0 - l1 + l2
+        u = - 5*error + v
+        v = 0.5*v - 0.1*error
 
         # 8. Command Arduino
         u_sat = np.clip(u, -1.0, 1.0)
