@@ -16,7 +16,7 @@ model = models.Sequential([
     layers.Flatten(input_shape=(28, 28)),
     layers.Dense(128, activation='relu'),
     layers.Dense(64, activation='relu'),
-    layers.Dense(32, activation='relu'),
+    #layers.Dense(32, activation='relu'),
     layers.Dense(10, activation='softmax')
 ])
 
@@ -33,7 +33,7 @@ model.compile(
 model.fit(
     train_images,
     train_labels,
-    epochs=100,
+    epochs=20,
     verbose=1
 )
 
