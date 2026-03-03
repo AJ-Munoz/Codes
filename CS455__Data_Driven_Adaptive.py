@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 import serial
 import time
 import numpy as np
@@ -6,8 +5,6 @@ import numpy as np
 # --- Configuration ---
 PORT = 'COM16'  # Check your port in Device Manager (Windows) or /dev/tty* (Linux/Mac)
 BAUD = 115200   # Change this in Device Manager if needed
-TICKS = 4128    # Counter Ticks per Half Revolution (172*24)
-Ts = 0.003      # Target Sampling Times
 TIMEOUT = 0.1
 
 # --- Initialize Serial ---
@@ -18,16 +15,22 @@ except Exception as error:
     print(f"Connection failed: {error}")
     exit()
 
-# --- User Input ---
 print("\n--- DC Motor Control ---")
 
 # --- System Variables ---
-t, theta, error, error_prev = 0.0, 0.0, 0.0, 0.0
+TICKS = 4128    # Counter Ticks per Half Revolution (172*24)
+Ts = 0.003      # Target Sampling Time
+t, theta = 0.0, 0.0
 theta0 = None
-u, v, = 0.0, 0.0
-gamma = None
 dt = 0.0 # dt is calculated in the loop
 ISE, ISC = 0.0, 0.0
+
+# Control parameters
+u, v = 0.0, 0.0
+error, error_prev = 0.0, 0.0
+gamma = 0.5  # adaptive gain
+epsilon = 0.5  # control gain
+alpha_eta = 0.1  # learning rate for eta
 
 # --- Start Experiment ---
 print("Experiment Starts. Press Ctrl+C to stop.\n")
@@ -75,8 +78,8 @@ try:
         error_prev = error
         error = theta - ref
 
-        # Projected Gauss-Seidel for |u| <= uM
-        u = - 5*error + v
+        # Adaptive Control Law 
+        u = - gamma*error + v
         v = 0.5*v - 0.1*error
 
         # 8. Command Arduino

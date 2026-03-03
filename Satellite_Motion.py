@@ -22,7 +22,7 @@ def get_R(phi, theta, psi):
 # Setup simulation
 dt, steps = 0.001, 10000
 eta = np.array([0.0, 1.5708, 0.0])  # Initial orientation (roll, pitch, yaw)
-omega_cmd = np.array([0.05, -0.02, 0.1])
+omega_cmd = np.array([0.1, 0.05, 0.2])
 history = []
 time = [0]
 
