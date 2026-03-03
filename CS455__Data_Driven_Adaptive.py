@@ -27,7 +27,7 @@ ISE, ISC = 0.0, 0.0
 
 # Control parameters
 u, v = 0.0, 0.0
-error, error_prev = 0.0, 0.0
+error, error_next = 0.0, 0.0
 gamma = 0.5  # adaptive gain
 epsilon = 0.5  # control gain
 alpha_eta = 0.1  # learning rate for eta
@@ -42,19 +42,19 @@ try:
     next_sample_time = start_time + Ts # Initialize the target time
     
     while t < 20:
-        # 1. Busy-wait until exactly the next sample time
+        # 1. Busy until the next sample time
         while time.perf_counter() < next_sample_time:
             pass
         
-        # 2. Calculate actual dt *before* updating last_sample_time
+        # 2. Calculate actual dt
         current_time = time.perf_counter()
         dt = current_time - last_sample_time 
         last_sample_time = current_time
 
-        # 3. Calculate absolute time since start (for logging)
+        # 3. Calculate absolute time since start
         t = current_time - start_time
 
-        # 4. Schedule next loop: Add the fixed interval (Ts) to the target time
+        # 4. Schedule next loop
         next_sample_time += Ts 
         
         # 5. Read Encoder
@@ -75,12 +75,12 @@ try:
         
         # 7. Tracking Control
         ref = 0.5*np.pi * np.sin(t) + 0.5*np.pi * np.sin(t/2)
-        error_prev = error
-        error = theta - ref
+        error = error_next
+        error_next = theta - ref
 
         # Adaptive Control Law 
         u = - gamma*error + v
-        v = 0.5*v - 0.1*error
+        v = (1-epsilon)*v - alpha_eta*error_next
 
         # 8. Command Arduino
         u_sat = np.clip(u, -1.0, 1.0)
