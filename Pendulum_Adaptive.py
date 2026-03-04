@@ -94,11 +94,11 @@ def update(i):
     ax.set_xlabel('X [m]')
     ax.set_ylabel('Y [m]')
     title_text = (
-        f"Orbital Tracking  |  t = {time[i]:.2f} s  |  "
+        f"Pendulum:   t = {time[i]:.2f} s  |  "
         f"theta = {np.degrees(theta_log[i]):.1f}°"
     )
     ax.set_title(title_text, fontsize=12)
 
-skip = 50  # show every skip samples for speed (adjust as you like)
+skip = 100  # show every skip samples for speed (adjust as you like)
 ani = FuncAnimation(fig, update, frames=range(0, N, skip), interval=dt*1000, repeat=False)
 plt.show()

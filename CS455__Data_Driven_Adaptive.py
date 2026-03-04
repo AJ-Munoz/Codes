@@ -28,9 +28,10 @@ ISE, ISC = 0.0, 0.0
 # Control parameters
 u, v = 0.0, 0.0
 error, error_next = 0.0, 0.0
-gamma = 0.5  # adaptive gain
+gamma = 10.0  # adaptive gain
 epsilon = 0.5  # control gain
-alpha_eta = 0.1  # learning rate for eta
+alpha_eta = 0.01  # learning rate for eta
+#alpha_eta = 4*np.sqrt(epsilon*(2-epsilon)) / (1-epsilon)  # Theoretical max error for stability
 
 # --- Start Experiment ---
 print("Experiment Starts. Press Ctrl+C to stop.\n")
@@ -91,7 +92,7 @@ try:
         # 9. Metrics & Logging
         ISE += dt * error**2
         ISC += dt * u**2
-        f.write(f"{t:.4f}\t{error:.4f}\t{theta:.4f}\t{ref:.4f}\t{u:.4f}\t{dt:.4f}\n")
+        f.write(f"{t:.4f}\t{error:.4f}\t{theta:.4f}\t{ref:.4f}\t{u_sat:.4f}\t{dt:.4f}\n")
 
 except KeyboardInterrupt:
     print("\nInterrupted by user.")
