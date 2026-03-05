@@ -28,10 +28,10 @@ ISE, ISC = 0.0, 0.0
 # Control parameters
 u, v = 0.0, 0.0
 error, error_next = 0.0, 0.0
-gamma = 10.0  # adaptive gain
-epsilon = 0.5  # control gain
-alpha_eta = 0.01  # learning rate for eta
-#alpha_eta = 4*np.sqrt(epsilon*(2-epsilon)) / (1-epsilon)  # Theoretical max error for stability
+gamma = 1.0        # adaptive gain
+epsilon = 0.5      # control gain
+alpha_eta = 1.0    # learning rate for eta
+#alpha_eta = 4*np.sqrt(epsilon*(2-epsilon)) / (1-epsilon)  # Theoretical max gain
 
 # --- Start Experiment ---
 print("Experiment Starts. Press Ctrl+C to stop.\n")

@@ -41,15 +41,19 @@ time = [0]
 
 # Simulation Loop
 for i in range(steps):
+    t_curr = time[-1]
     W_inv = damped_inverse(get_W(eta[0], eta[1]), 0.001)
-    eta_ref = np.array([np.pi/3, np.pi/2, -np.pi/6])  # Desired orientation (roll, pitch, yaw)
+    #np.sin(np.pi * t_curr)
+    roll =  np.pi       #
+    pitch = np.pi       #
+    yaw = np.pi         #
+    eta_ref = np.array([roll, pitch, yaw])  # Desired orientation 
     omega_cmd = - 1.0 * get_W(eta[0], eta[1]) @ (eta - eta_ref)  # Proportional control to track reference
     eta += (W_inv @ omega_cmd) * dt
     history.append(eta.copy())
     time.append(time[-1] + dt)
 
 # USE THIS FOR ANIMATION (GEMINI-GENERATED) INSTEAD OF STATIC PLOTS
-"""
 # --- Pre-generate Stars ---
 num_stars = 500
 star_coords = (np.random.rand(num_stars, 3) - 0.5) * 8 
@@ -88,7 +92,7 @@ def update(i):
                                              edgecolors='silver', alpha=1.0))
 
     title_text = (
-        f"Orbital Tracking\n"
+        f"Orbital Tracking (Gemini-Generated)\n"
         f"time: {time[i]:.2f}s | "
         f"Roll: {np.degrees(history[i][0]):.2f}° | "
         f"Pitch: {np.degrees(history[i][1]):.2f}° | "
@@ -105,12 +109,9 @@ ani = FuncAnimation(
     interval=dt * 1000, 
     repeat=False
 )
-
 plt.show()
-"""
 
 # USE THIS FOR STATIC PLOTS INSTEAD OF ANIMATION
-"""
 history_np = np.array(history)
 plt.figure(figsize=(10, 6))
 plt.title("Pseudoinverse-based Control Tracking", fontsize=16)
@@ -124,4 +125,3 @@ plt.legend()
 plt.grid(True, linestyle='--', alpha=0.7)
 plt.tight_layout()
 plt.show()
-"""

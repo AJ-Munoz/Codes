@@ -2,7 +2,7 @@ import numpy as np
 from scipy.linalg import pinv
 import matplotlib.pyplot as plt
 
-np.random.seed(7)
+np.random.seed(42)
 
 # Synthetic wind-tunnel data
 N = 250; 

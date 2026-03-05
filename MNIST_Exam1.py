@@ -15,9 +15,12 @@ test_images  = test_images.astype('float32') / 255.0
 model = models.Sequential([
     layers.Flatten(input_shape=(28, 28)),
     layers.Dense(128, activation='relu'),
+    #layers.Dropout(0.2),  # Add dropout for regularization
     layers.Dense(64, activation='relu'),
-    #layers.Dense(32, activation='relu'),
-    layers.Dense(10, activation='softmax')
+    #layers.Dropout(0.2),  # Add dropout for regularization
+    layers.Dense(32, activation='relu'),
+    #layers.Dropout(0.2),  # Add dropout for regularization
+    layers.Dense(10, activation='softmax'),
 ])
 
 model.summary()
@@ -33,7 +36,8 @@ model.compile(
 model.fit(
     train_images,
     train_labels,
-    epochs=20,
+    epochs=100,
+    shuffle=True,
     verbose=1
 )
 
