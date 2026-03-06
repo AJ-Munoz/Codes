@@ -27,7 +27,7 @@ history = []
 time = [0]
 
 for i in range(steps):
-    W_inv = damped_inverse(get_W(eta[0], eta[1]), 0.1)
+    W_inv = damped_inverse(get_W(eta[0], eta[1]), 0.0)
     omega_cmd += 0.01 * (np.random.rand(3) - 0.5)  # Add small random noise to the command
     eta += (W_inv @ omega_cmd) * dt
     history.append(eta.copy())
