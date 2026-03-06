@@ -27,7 +27,7 @@ history = []
 time = [0]
 
 for i in range(steps):
-    W_inv = damped_inverse(get_W(eta[0], eta[1]), 0.0)
+    W_inv = damped_inverse(get_W(eta[0], eta[1]), 0.01)
     omega_cmd += 0.01 * (np.random.rand(3) - 0.5)  # Add small random noise to the command
     eta += (W_inv @ omega_cmd) * dt
     history.append(eta.copy())
@@ -76,8 +76,10 @@ def update(i):
     panel_width, panel_length = 0.5, 1.2
     for side in [-1, 1]: 
         p_faces = [np.array([
-            [0, side*0.3, -panel_width/2], [0, side*(0.3+panel_length), -panel_width/2],
-            [0, side*(0.3+panel_length), panel_width/2], [0, side*0.3, panel_width/2]
+            [-panel_width/2, side*0.3, 0], 
+            [-panel_width/2, side*(0.3+panel_length), 0],
+            [ panel_width/2, side*(0.3+panel_length), 0], 
+            [ panel_width/2, side*0.3, 0]
         ])]
         rot_panel = [ (R @ f.T).T for f in p_faces ]
         ax.add_collection3d(Poly3DCollection(rot_panel, facecolors="#0E1448", 
