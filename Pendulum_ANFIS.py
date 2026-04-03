@@ -3,84 +3,96 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import skfuzzy as fuzz
 
-# --- Configuration ---
-dt, steps = 0.01, 2000
-time_steps = np.arange(0, steps * dt, dt)
-target = np.pi  # Target angle (0 is vertical down, let's aim for 0 for stability first)
-s_adaptive = np.array([0.78, 0.0]) # Start at ~45 degrees
-s_fixed = np.array([0.78, 0.0])
+# =========================================================
+# Configuration
+# =========================================================
+dt = 0.001
+TARGET_ANGLE = np.pi  
 
-# --- Fuzzy Setup ---
-# Narrower centers and sigma for better sensitivity
-centers = np.array([-0.5, 0.0, 0.5]) 
-sigma = 0.3
-num_rules = 27 
-beta = np.zeros(num_rules) # Renamed from theta
-gamma = 100.0  # Increased learning rate for visible adaptation
+state_adaptive = np.array([0.0, 0.0])
+state_fixed = np.array([0.0, 0.0])
 
-# --- Simulation Variables ---
-e_int_a = 0.0
-e_prev_a = 0.78
+# Fuzzy Parameters
+CENTERS = np.array([-1.0, 0.0, 1.0])
+SIGMA = 0.5
+NUM_RULES = 27
+weights = np.zeros(NUM_RULES)
+GAMMA = 150.0  # Learning rate
 
-def get_phi(e, de, ie):
-    # Gaussian Membership
-    m_e = [fuzz.gaussmf(e, c, sigma) for c in centers]
-    m_de = [fuzz.gaussmf(de, c, sigma) for c in centers]
-    m_ie = [fuzz.gaussmf(ie, c, sigma) for c in centers]
-    
-    # Rule Strengths (Product T-norm)
-    w = []
-    for i in range(3):
-        for j in range(3):
-            for k in range(3):
-                w.append(m_e[i] * m_de[j] * m_ie[k])
-    
-    phi = np.array(w)
-    total_w = np.sum(phi)
-    return phi / total_w if total_w > 1e-9 else phi
+# Memory
+error_int_a = 0.0
+prev_err_a = 0.0
+prev_err_f = 0.0
+
+def fuzzy_basis_sk(error, error_dot, error_int):
+    # 1. Calculate membership values for each input and each center
+    m_e = [fuzz.gaussmf(error, c, SIGMA) for c in CENTERS]
+    m_de = [fuzz.gaussmf(error_dot, c, SIGMA) for c in CENTERS]
+    m_ie = [fuzz.gaussmf(error_int, c, SIGMA) for c in CENTERS]
+
+    # 2. Combine into rules (Product T-Norm)
+    phi = np.array([
+        m_e[i] * m_de[j] * m_ie[k]
+        for i in range(3) for j in range(3) for k in range(3)
+    ])
+
+    total = np.sum(phi)
+    return phi / total if total > 1e-9 else phi
+
+def pendulum_step(state, u):
+    theta, theta_dot = state
+    accel = u - 10.0 * np.sin(theta) - 0.5 * theta_dot
+    theta_dot += accel * dt
+    theta += theta_dot * dt
+    return np.array([theta, theta_dot])
+
+# =========================================================
+# Animation
+# =========================================================
+fig, ax = plt.subplots(figsize=(5, 5))
+ax.set_xlim(-1.5, 1.5); ax.set_ylim(-1.5, 1.5); ax.set_aspect('equal')
+line_a, = ax.plot([], [], 'ro-', lw=2, label='ANFIS PID')
+line_f, = ax.plot([], [], 'bo-', lw=2, alpha=0.3, label='Fuzzy PD')
+ax.legend()
 
 def update(frame):
-    global s_adaptive, s_fixed, e_int_a, e_prev_a, beta
-    
-    # 1. ADAPTIVE CONTROLLER
-    err_a = target - s_adaptive[0]
-    de_a = (err_a - e_prev_a) / dt
-    e_int_a += err_a * dt
-    
-    phi = get_phi(err_a, de_a, e_int_a)
-    u_a = np.dot(beta, phi) + 15 * err_a + 5 * (err_a - (target - s_adaptive[0]))/dt
-    
-    # Adaptation Law (Lyapunov-based)
-    beta += gamma * (err_a * phi) * dt
-    
-    # 2. FIXED PID (for comparison)
-    err_f = target - s_fixed[0]
-    u_f = 15 * err_f + 5 * (err_f - (target - s_fixed[0]))/dt # Simple P+D
-    
-    # 3. PHYSICS (Inverted Pendulum)
-    def step(s, u):
-        # Dampened pendulum: accel = u - gravity - friction
-        accel = u - 10.0 * np.sin(s[0]) - 1.0 * s[1]
-        s[1] += accel * dt
-        s[0] += s[1] * dt
-        return s
+    global state_adaptive, state_fixed, weights
+    global error_int_a, prev_err_a, prev_err_f
 
-    s_adaptive = step(s_adaptive, u_a)
-    s_fixed = step(s_fixed, u_f)
+    # --- Poorly Tuned Gains ---
+    kp, kd = 2.0, 5.0
+
+    # --- Adaptive Logic ---
+    err_a = TARGET_ANGLE - state_adaptive[0]
+    err_dot_a = (err_a - prev_err_a) / dt
+    error_int_a += err_a * dt
     
-    # Update Visuals
-    line_a.set_data([0, np.sin(s_adaptive[0])], [0, -np.cos(s_adaptive[0])])
-    line_f.set_data([0, np.sin(s_fixed[0])], [0, -np.cos(s_fixed[0])])
-    e_prev_a = err_a
+    phi = fuzzy_basis_sk(err_a, err_dot_a, error_int_a * 0.1)
+    
+    # SLIDING SURFACE: Alleviates the overshoot
+    S = err_dot_a + 2.0 * err_a 
+    
+    # Adaptive Law: Learn based on S, not just error
+    weights += (GAMMA * S * phi - 0.1 * weights) * dt
+    u_a = np.dot(weights, phi) + (kp * err_a + kd * err_dot_a)
+
+    # --- Fixed PD Logic ---
+    err_f = TARGET_ANGLE - state_fixed[0]
+    err_dot_f = (err_f - prev_err_f) / dt
+    u_f = kp * err_f + kd * err_dot_f
+
+    # --- Physics & Memory Update ---
+    state_adaptive = pendulum_step(state_adaptive, u_a)
+    state_fixed = pendulum_step(state_fixed, u_f)
+    prev_err_a, prev_err_f = err_a, err_f
+
+    # --- Drawing both Pendulums ---
+    line_a.set_data([0, np.sin(state_adaptive[0])], [0, -np.cos(state_adaptive[0])])
+    line_f.set_data([0, np.sin(state_fixed[0])], [0, -np.cos(state_fixed[0])])
+
     return line_a, line_f
 
-# --- Animation ---
-fig, ax = plt.subplots(figsize=(6,6))
-ax.set_xlim(-1.5, 1.5); ax.set_ylim(-1.5, 1.5)
-line_a, = ax.plot([], [], 'ro-', lw=3, label='Adaptive (Beta)')
-line_f, = ax.plot([], [], 'bo-', lw=2, alpha=0.3, label='Fixed PID')
-ax.legend()
-ax.grid(True, alpha=0.3)
-
-ani = FuncAnimation(fig, update, frames=steps, interval=10, blit=True)
+skip = 10
+ani = FuncAnimation(fig, update, frames=range(0, 2000, skip), interval=dt*1000, blit=True)
+plt.grid(True, alpha=0.3)
 plt.show()
