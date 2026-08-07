@@ -31,7 +31,7 @@ omega_fuzzy = 0.0
 # -----------------------------
 # Fuzzy Approximation of sin(theta)
 # -----------------------------
-n_rules = 4 # Number of fuzzy rules (membership functions)
+n_rules = 64 # Number of fuzzy rules (membership functions)
 theta_univ = np.linspace(0, 2*np.pi, 4000) # High-resolution universe for smooth membership functions
 
 centers = np.linspace(0, 2*np.pi, n_rules) # Evenly spaced centers around the circle

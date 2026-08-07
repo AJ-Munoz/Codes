@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+
 # 1. Create a signal with a sharper jump
 x = np.linspace(0, 10, 100)
 f = np.where(x < 5, np.sin(x), np.cos(x))
